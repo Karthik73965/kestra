@@ -79,6 +79,7 @@
                     :label="t('dashboard.success_ratio')"
                     :tooltip="t('dashboard.success_ratio_tooltip')"
                     :value="stats.success"
+                    :loading="loadingExecutionsState"         
                     :redirect="{
                         name: 'executions/list',
                         query: {
@@ -97,6 +98,7 @@
                     :label="t('dashboard.failure_ratio')"
                     :tooltip="t('dashboard.failure_ratio_tooltip')"
                     :value="stats.failed"
+                    :loading="loadingExecutionsState"         
                     :redirect="{
                         name: 'executions/list',
                         query: {
@@ -114,6 +116,7 @@
                     :icon="FileTree"
                     :label="t('flows')"
                     :value="numbers.flows"
+                    :loading="loadingStateNumbers"         
                     :redirect="{
                         name: 'flows/list',
                         query: {scope: 'USER', size: 100, page: 1},
@@ -125,6 +128,7 @@
                 <Card
                     :icon="LightningBolt"
                     :label="t('triggers')"
+                    :loading="loadingStateNumbers"         
                     :value="numbers.triggers"
                     :redirect="{
                         name: 'admin/triggers',
@@ -141,6 +145,7 @@
                     :data="graphData"
                     :total="stats.total"
                     :class="{'me-2': !props.flow}"
+                    :loading="loadingExecutionsState"
                 />
             </el-col>
             <el-col v-if="!props.flow" :xs="24" :lg="8">
@@ -215,6 +220,7 @@
                 <ExecutionsNamespace
                     :data="filteredNamespaceExecutions"
                     :total="stats.total"
+                    :loading="loadingExecutionsState"
                 />
             </el-col>
         </el-row>
@@ -350,13 +356,18 @@
     });
 
     const defaultNumbers = {flows: 0, triggers: 0};
+    const loadingStateNumbers = ref(true);
     const numbers = ref({...defaultNumbers});
     const fetchNumbers = () => {
+        loadingStateNumbers.value = true
         store.$http
             .post(`${apiUrl(store)}/stats/summary`, route.query)
             .then((response) => {
                 if (!response.data) return;
                 numbers.value = {...defaultNumbers, ...response.data};
+            })
+            .finally(() => {
+                loadingStateNumbers.value = false; 
             });
     };
 
@@ -407,7 +418,9 @@
             return accumulator;
         }, null);
     };
+    const loadingExecutionsState = ref(true)
     const fetchExecutions = () => {
+        loadingExecutionsState.value = true
         store.dispatch("stat/daily", route.query).then((response) => {
             const sorted = response.sort(
                 (a, b) => new Date(b.date) - new Date(a.date),
@@ -419,7 +432,10 @@
                 yesterday: sorted.at(-2),
                 today: sorted.at(-1),
             };
-        });
+        }).finally(()=>{
+            loadingExecutionsState.value = false
+        })
+       
     };
 
     const graphData = computed(() => store.state.stat.daily || []);
