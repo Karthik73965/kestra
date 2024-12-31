@@ -916,12 +916,13 @@ public class ExecutorService {
                         "handleExecutionUpdatingTask.updateExecution"
                     );
 
+                    var taskState = executionUpdatingTask.resolveState(workerTask.getRunContext(), executor.getExecution()).orElse(State.Type.SUCCESS);
                     workerTaskResults.add(
                         WorkerTaskResult.builder()
                             .taskRun(workerTask.getTaskRun().withAttempts(
-                                        Collections.singletonList(TaskRunAttempt.builder().state(new State().withState(State.Type.SUCCESS)).build())
+                                        Collections.singletonList(TaskRunAttempt.builder().state(new State().withState(taskState)).build())
                                     )
-                                    .withState(State.Type.SUCCESS)
+                                    .withState(taskState)
                             )
                             .build()
                     );

@@ -1,7 +1,7 @@
 <template>
     <div
         v-show="explorerVisible"
-        class="p-3 sidebar"
+        class="p-2 sidebar"
         @click="$refs.tree.setCurrentKey(undefined)"
         @contextmenu.prevent="onTabContextMenu"
     >
@@ -1070,33 +1070,29 @@
 
 .el-tree {
     height: calc(100% - 64px);
-    overflow: hidden auto;
+    overflow: auto;
 
     .el-tree__empty-block {
         height: auto;
     }
 
-    &::-webkit-scrollbar {
-        width: 2px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: var(--card-bg);
-    }
-
     &::-webkit-scrollbar-thumb {
         background: var(--bs-primary);
-        border-radius: 0px;
+        border-radius: 5px;
+
+        html.dark & {
+            background:  var(--bs-primary);
+        }
     }
 
     .node {
         --el-tree-node-content-height: 36px;
         --el-tree-node-hover-bg-color: transparent;
         line-height: 36px;
+    }
 
-        .el-tree-node__content {
-            width: 100%;
-        }
+    .el-tree-node.is-current > .el-tree-node__content {
+            min-width: fit-content;
     }
 }
 </style>
@@ -1107,6 +1103,8 @@
 .sidebar {
     background: var(--card-bg);
     border-right: 1px solid var(--bs-border-color);
+    overflow-x: hidden;
+    min-width: calc(30% - 8px);
 
     .empty {
         position: relative;
@@ -1155,7 +1153,7 @@
         color: var(--el-text-color-regular);
 
         &:hover {
-            color: var(--el-text-color-primary);
+            color: var(--el-text-color-secondary);
         }
     }
 
